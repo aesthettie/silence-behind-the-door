@@ -274,6 +274,110 @@
             50%      { opacity: 1; }
         }
 
+        /* ---------- ЭКРАН-ЗАГЛУШКА ---------- */
+        .lock-box {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            background: rgba(18, 18, 18, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.15);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .lock-title {
+            font-size: clamp(1.8rem, 5vw, 2.4rem);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: #f0f0f0;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.45);
+            margin: 0 0 0.6rem;
+        }
+
+        .lock-subtitle {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--secondary-text-color);
+            letter-spacing: 0.2em;
+            margin-bottom: 2.5rem;
+        }
+
+        .lock-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .lock-input {
+            padding: 0.9rem 1.2rem;
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            text-align: center;
+            letter-spacing: 0.2em;
+            color: var(--text-color);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .lock-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .lock-input::placeholder {
+            color: #4a4238;
+            letter-spacing: 0.2em;
+        }
+
+        .lock-button {
+            padding: 0.9rem 2rem;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #121212;
+            background: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lock-button:hover {
+            background: #e6c65a;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .lock-error {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #b85c5c;
+            margin-top: 1rem;
+            min-height: 1.2rem;
+            letter-spacing: 0.05em;
+        }
+
+        .ozon-text {
+            font-size: 1rem;
+            color: #c8c0b0;
+            line-height: 1.9;
+            letter-spacing: 0.05em;
+            margin-bottom: 2.5rem;
+        }
+
+        .ozon-text strong {
+            color: var(--accent-color);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+
         /* ---------- ПАСХАЛКИ ---------- */
         #page-eggs.active {
             display: block;
@@ -389,6 +493,7 @@
             .eggs-container { padding: 3rem 1.2rem 5rem; }
             .secret-hint { font-size: 0.75rem; padding: 0.7rem 1.2rem; letter-spacing: 0.15em; }
             .download-button { padding: 0.9rem 1.8rem; font-size: 1rem; }
+            .lock-box { padding: 2rem 1.5rem; }
         }
     </style>
 </head>
@@ -400,16 +505,57 @@
     <div class="dust" id="dust"></div>
 
     <!-- ============================================================ -->
+    <!-- ЭКРАН 0: ЗАГЛУШКА С ПАРОЛЕМ -->
+    <!-- ============================================================ -->
+    <div id="page-lock" class="page active">
+        <div class="lock-box">
+            <h2 class="lock-title">Тишина за дверью</h2>
+            <p class="lock-subtitle">чтобы войти — назови дату</p>
+
+            <form class="lock-form" onsubmit="checkPassword(event)">
+                <input
+                    type="text"
+                    id="password-input"
+                    class="lock-input"
+                    placeholder="дд.мм.гггг"
+                    autocomplete="off"
+                >
+                <button type="submit" class="lock-button">Войти</button>
+            </form>
+
+            <p id="lock-error" class="lock-error"></p>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ЭКРАН 0.5: ПОСЫЛКА С ОЗОНА -->
+    <!-- ============================================================ -->
+    <div id="page-ozon" class="page">
+        <div class="lock-box">
+            <h2 class="lock-title">Прежде чем войти</h2>
+            <p class="lock-subtitle">тебя кое-что ждёт</p>
+
+            <p class="ozon-text">
+                Посылка из Озона.<br>
+                Адрес: <strong>Белкинская ул., 40</strong><br>
+                С 19.10 по 27.10<br>
+                Код получения: <strong>000 000</strong>
+            </p>
+
+            <button class="lock-button" onclick="enterSite()">Войти</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- СТРАНИЦА 1: ГЛАВНАЯ -->
     <!-- ============================================================ -->
-    <div id="page-main" class="page active">
+    <div id="page-main" class="page">
         <header>
             <h1>ТИШИНА ЗА ДВЕРЬЮ</h1>
             <p class="subtitle">всему свое время</p>
         </header>
 
         <section class="trailer-section">
-            <!-- Видео лежит в репозитории и называется video.mp4 -->
             <video
                 class="trailer-video"
                 controls
@@ -422,10 +568,6 @@
         </section>
 
         <section class="download-section">
-            <!--
-              Кнопка скачивания игры.
-              Ведёт на Google Drive, где лежит архив с игрой (45 МБ).
-            -->
             <a
                 href="https://drive.google.com/file/d/1kU_kfnrvr8fMZUswtOa2qFsOD7TF18tH/view?usp=sharing"
                 class="download-button"
@@ -433,7 +575,7 @@
                 rel="noopener"
             >Скачать игру</a>
 
-            <p class="download-note">45 МБ · распакуй архив</p>
+            <p class="download-note">скачай папку и запусти «Тишина за дверью.exe»</p>
 
             <a href="https://t.me/aesthettie" class="telegram-link" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -442,7 +584,6 @@
                 <span>@aesthettie</span>
             </a>
 
-            <!-- Кнопка-пасхалка -->
             <div class="secret-hint" onclick="showEggs()">
                 <span class="dot"></span>
                 <span>я оставила ещё кое-что. не здесь</span>
@@ -528,7 +669,36 @@
     </div>
 
     <script>
-        // --- Переключение страниц ---
+        // ---------- Пароль для входа ----------
+        const CORRECT_PASSWORD = '23.08.2026';
+
+        function checkPassword(event) {
+            event.preventDefault();
+
+            const input = document.getElementById('password-input');
+            const error = document.getElementById('lock-error');
+
+            const value = input.value.trim();
+
+            if (value === CORRECT_PASSWORD) {
+                error.textContent = '';
+                document.getElementById('page-lock').classList.remove('active');
+                document.getElementById('page-ozon').classList.add('active');
+                window.scrollTo(0, 0);
+            } else {
+                error.textContent = 'не та дата. вспомни.';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function enterSite() {
+            document.getElementById('page-ozon').classList.remove('active');
+            document.getElementById('page-main').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // ---------- Переключение на пасхалки ----------
         function showEggs() {
             document.getElementById('page-main').classList.remove('active');
             document.getElementById('page-eggs').classList.add('active');
@@ -541,7 +711,7 @@
             window.scrollTo(0, 0);
         }
 
-        // --- Пылинки ---
+        // ---------- Пылинки ----------
         const dustContainer = document.getElementById('dust');
         const dustCount = 40;
 
