@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тишина за дверью</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --accent-color: #d4af37;
+            --secondary-text-color: #888;
+            --font-main: 'Lora', serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+        }
+
+        /* ---------- Общий фон ---------- */
+        .background {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1509373247324-3b3c8c9c1e7e?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.18;
+            z-index: -3;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(18,18,18,0) 0%, rgba(18,18,18,1) 80%);
+            z-index: -2;
+        }
+
+        .door-light {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40vw;
+            max-width: 600px;
+            height: 250px;
+            background: radial-gradient(ellipse at bottom, rgba(212, 175, 55, 0.35) 0%, rgba(212, 175, 55, 0) 70%);
+            z-index: -1;
+            animation: breathe 5s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+            50%      { opacity: 1;   transform: translateX(-50%) scale(1.05); }
+        }
+
+        /* ---------- Пылинки ---------- */
+        .dust {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .dust span {
+            position: absolute;
+            background: rgba(230, 200, 120, 0.55);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(212, 175, 55, 0.6);
+            animation: float linear infinite;
+            will-change: transform, opacity;
+        }
+
+        @keyframes float {
+            0%   { transform: translateY(0) translateX(0);        opacity: 0; }
+            10%  { opacity: 0.9; }
+            90%  { opacity: 0.7; }
+            100% { transform: translateY(-100vh) translateX(40px); opacity: 0; }
+        }
+
+        /* ---------- Страницы ---------- */
+        .page {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* ---------- ГЛАВНАЯ ---------- */
+        header { margin-bottom: 3rem; }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: #f0f0f0;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.45);
+            margin: 0;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: var(--secondary-text-color);
+            letter-spacing: 0.25em;
+            margin-top: 0.5rem;
+            font-style: italic;
+            animation: fadeIn 2s ease-in-out 0.5s forwards;
+            opacity: 0;
+        }
+
+        /* ---------- Видео ---------- */
+        .trailer-section {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2.5rem;
+            animation: fadeIn 2s ease-in-out 1s forwards;
+            opacity: 0;
+        }
+
+        .trailer-video {
+            width: 100%;
+            display: block;
+            border: 1px solid #333;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+            background-color: #000;
+            outline: none;
+            border-radius: 4px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .trailer-video:hover {
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.35);
+        }
+
+        /* ---------- Кнопки ---------- */
+        .download-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            animation: fadeIn 2s ease-in-out 1.4s forwards;
+            opacity: 0;
+        }
+
+        .download-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #121212;
+            background-color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 5px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            font-family: var(--font-main);
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background-color: #e6c65a;
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .download-note {
+            font-size: 0.85rem;
+            font-style: italic;
+            color: #6a6258;
+            letter-spacing: 0.1em;
+            margin: 0;
+        }
+
+        .telegram-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            color: var(--secondary-text-color);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: color 0.3s ease;
+        }
+
+        .telegram-link:hover { color: var(--accent-color); }
+
+        .telegram-link svg {
+            width: 20px; height: 20px;
+            fill: currentColor;
+        }
+
+        /* ---------- Кнопка-пасхалка ---------- */
+        .secret-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+
+            margin-top: 2rem;
+            padding: 0.8rem 1.8rem;
+
+            font-family: var(--font-main);
+            font-size: 0.85rem;
+            font-style: italic;
+            letter-spacing: 0.2em;
+            color: #7a6f5e;
+
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 40px;
+
+            cursor: pointer;
+            transition: all 0.5s ease;
+
+            animation: gentlePulse 4s ease-in-out infinite;
+        }
+
+        .secret-hint:hover {
+            color: var(--accent-color);
+            border-color: rgba(212, 175, 55, 0.7);
+            background: rgba(212, 175, 55, 0.12);
+            letter-spacing: 0.28em;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .secret-hint .dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.5;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .secret-hint:hover .dot {
+            opacity: 1;
+            transform: scale(1.3);
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { opacity: 0.75; }
+            50%      { opacity: 1; }
+        }
+
+        /* ---------- ЭКРАН-ЗАГЛУШКА ---------- */
+        .lock-box {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            background: rgba(18, 18, 18, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.15);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .lock-title {
+            font-size: clamp(1.8rem, 5vw, 2.4rem);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: #f0f0f0;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.45);
+            margin: 0 0 0.6rem;
+        }
+
+        .lock-subtitle {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--secondary-text-color);
+            letter-spacing: 0.2em;
+            margin-bottom: 2.2rem;
+        }
+
+        /* ---------- Информация про Озон на заглушке ---------- */
+        .ozon-info {
+            margin-bottom: 2.2rem;
+            padding: 1.3rem 1rem;
+            background: rgba(212, 175, 55, 0.05);
+            border-top: 1px dashed rgba(212, 175, 55, 0.25);
+            border-bottom: 1px dashed rgba(212, 175, 55, 0.25);
+            font-size: 0.98rem;
+            color: #c8c0b0;
+            line-height: 1.9;
+            letter-spacing: 0.04em;
+        }
+
+        .ozon-info .ozon-label {
+            display: block;
+            font-size: 0.8rem;
+            font-style: italic;
+            color: #7a6f5e;
+            letter-spacing: 0.25em;
+            margin-bottom: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .ozon-info strong {
+            color: var(--accent-color);
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        .lock-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .lock-input {
+            padding: 0.9rem 1.2rem;
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            text-align: center;
+            letter-spacing: 0.2em;
+            color: var(--text-color);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .lock-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .lock-input::placeholder {
+            color: #4a4238;
+            letter-spacing: 0.2em;
+        }
+
+        .lock-button {
+            padding: 0.9rem 2rem;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #121212;
+            background: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lock-button:hover {
+            background: #e6c65a;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .lock-error {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #b85c5c;
+            margin-top: 1rem;
+            min-height: 1.2rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* ---------- ПАСХАЛКИ ---------- */
+        #page-eggs.active {
+            display: block;
+            padding: 0;
+        }
+
+        .eggs-container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 4rem 2rem 6rem;
+            text-align: left;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: inline-block;
+            font-size: 0.9rem;
+            color: var(--secondary-text-color);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            margin-bottom: 3rem;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .back-link:hover { color: var(--accent-color); }
+
+        .eggs-container h2 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: #f0e8d8;
+            margin: 0 0 0.5rem;
+        }
+
+        .eggs-subtitle {
+            font-style: italic;
+            color: var(--secondary-text-color);
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            margin-bottom: 3.5rem;
+        }
+
+        .intro {
+            color: #b0a898;
+            font-style: italic;
+            border-left: 2px solid rgba(212, 175, 55, 0.5);
+            padding-left: 1.2rem;
+            margin-bottom: 3.5rem;
+            font-size: 1rem;
+        }
+
+        .egg {
+            margin-bottom: 3rem;
+            padding-bottom: 2.5rem;
+            border-bottom: 1px dashed rgba(212, 175, 55, 0.2);
+        }
+
+        .egg:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .egg-title {
+            font-size: 1.15rem;
+            color: var(--accent-color);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .egg-text {
+            color: #c8c0b0;
+            font-size: 1rem;
+            margin: 0 0 1rem 0;
+        }
+
+        .egg-text:last-child {
+            margin-bottom: 0;
+        }
+
+        .egg-text em {
+            color: #a89878;
+            font-style: italic;
+        }
+
+        .playlist {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 1.2rem 0;
+        }
+
+        .playlist li {
+            color: #b0a898;
+            font-style: italic;
+            padding: 0.5rem 0;
+            letter-spacing: 0.02em;
+            border-bottom: 1px dashed rgba(212, 175, 55, 0.1);
+        }
+
+        .playlist li:last-child {
+            border-bottom: none;
+        }
+
+        /* ---------- ЭТАПЫ ПАСХАЛОК ---------- */
+        .egg-stage {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 1.2s ease, opacity 1s ease;
+        }
+        .egg-stage.open {
+            max-height: 30000px;
+            opacity: 1;
+        }
+
+        /* Центрирование заголовков этапа «Тихий фокус» */
+        .egg-stage.center-stage {
+            text-align: center;
+        }
+        .egg-stage.center-stage .egg-section-title,
+        .egg-stage.center-stage .egg-section-sub {
+            text-align: center;
+        }
+        .egg-stage.center-stage .focus-download {
+            text-align: center;
+        }
+
+        /* Затык «это еще не все» */
+        .more-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+
+            margin: 2.5rem auto;
+            padding: 2rem 1.5rem;
+
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+
+            border-top: 1px dashed rgba(212, 175, 55, 0.25);
+            border-bottom: 1px dashed rgba(212, 175, 55, 0.25);
+
+            transition: all 0.5s ease;
+            animation: gentlePulse 4s ease-in-out infinite;
+        }
+
+        .more-hint:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            background: rgba(212, 175, 55, 0.04);
+        }
+
+        .more-hint .more-label {
+            font-size: 0.85rem;
+            font-style: italic;
+            letter-spacing: 0.3em;
+            color: #7a6f5e;
+            text-transform: uppercase;
+            transition: color 0.4s ease, letter-spacing 0.4s ease;
+        }
+
+        .more-hint:hover .more-label {
+            color: var(--accent-color);
+            letter-spacing: 0.4em;
+        }
+
+        .more-hint .more-arrow {
+            font-size: 1.2rem;
+            color: #7a6f5e;
+            transition: transform 0.5s ease, color 0.4s ease;
+        }
+
+        .more-hint:hover .more-arrow {
+            color: var(--accent-color);
+            transform: translateY(4px);
+        }
+
+        /* Кнопка скачивания новой игры */
+        .focus-download {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 2.5rem 0 1rem;
+            text-align: center;
+        }
+
+        /* ---------- НОВЫЙ РАЗДЕЛ: НОВАЯ ИГРА ---------- */
+        .egg-section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: #f0e8d8;
+            margin: 4rem 0 0.5rem;
+            text-shadow: 0 0 18px rgba(212, 175, 55, 0.35);
+        }
+
+        .egg-section-sub {
+            font-style: italic;
+            color: var(--secondary-text-color);
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            margin-bottom: 3rem;
+        }
+
+        .video-block {
+            margin: 2.5rem 0 3.5rem;
+            padding: 1.6rem 1.4rem;
+            background: rgba(212, 175, 55, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .video-block .video-label {
+            display: block;
+            font-size: 0.8rem;
+            font-style: italic;
+            color: #7a6f5e;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .video-block .video-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            letter-spacing: 0.06em;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-block .video-desc {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: #b0a898;
+            line-height: 1.7;
+            margin-bottom: 1.4rem;
+        }
+
+        .footer-note {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px dashed rgba(212, 175, 55, 0.2);
+            text-align: center;
+            color: var(--secondary-text-color);
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .door-light { width: 70vw; height: 180px; }
+            .eggs-container { padding: 3rem 1.2rem 5rem; }
+            .secret-hint { font-size: 0.75rem; padding: 0.7rem 1.2rem; letter-spacing: 0.15em; }
+            .download-button { padding: 0.9rem 1.8rem; font-size: 1rem; }
+            .lock-box { padding: 2rem 1.3rem; }
+            .ozon-info { font-size: 0.9rem; padding: 1rem 0.8rem; }
+            .egg-section-title { font-size: 1.35rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="door-light"></div>
+    <div class="dust" id="dust"></div>
+
+    <!-- ============================================================ -->
+    <!-- ЭКРАН 0: ЗАГЛУШКА С АДРЕСОМ ОЗОНА И ПАРОЛЕМ -->
+    <!-- ============================================================ -->
+    <div id="page-lock" class="page active">
+        <div class="lock-box">
+            <h2 class="lock-title">Тишина за дверью</h2>
+            <p class="lock-subtitle">прежде чем открыть — забери</p>
+
+            <div class="ozon-info">
+                <span class="ozon-label">посылка из озона</span>
+                Адрес: <strong>Белкинская ул., 40</strong><br>
+                С <strong>19.10</strong> по <strong>27.10</strong><br>
+                Код получения: <strong>000 000</strong>
+            </div>
+
+            <form class="lock-form" onsubmit="checkPassword(event)">
+                <input
+                    type="text"
+                    id="password-input"
+                    class="lock-input"
+                    placeholder="дд.мм.гггг"
+                    autocomplete="off"
+                >
+                <button type="submit" class="lock-button">Войти</button>
+            </form>
+
+            <p id="lock-error" class="lock-error"></p>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- СТРАНИЦА 1: ГЛАВНАЯ -->
+    <!-- ============================================================ -->
+    <div id="page-main" class="page">
+        <header>
+            <h1>ТИШИНА ЗА ДВЕРЬЮ</h1>
+            <p class="subtitle">всему свое время</p>
+        </header>
+
+        <section class="trailer-section">
+            <video
+                class="trailer-video"
+                controls
+                preload="metadata"
+                playsinline
+            >
+                <source src="video.mp4" type="video/mp4">
+                Твой браузер не поддерживает видео.
+            </video>
+        </section>
+
+        <section class="download-section">
+            <a
+                href="https://drive.google.com/file/d/12qXDrvsWT4Ch9dUbJ50in7O4YXluamOS/view?usp=sharing"
+                class="download-button"
+                target="_blank"
+                rel="noopener"
+            >Скачать игру</a>
+
+            <p class="download-note">скачай папку и запусти «Тишина за дверью.exe»</p>
+
+            <a href="https://t.me/aesthettie" class="telegram-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+                <span>@aesthettie</span>
+            </a>
+
+            <div class="secret-hint" onclick="showEggs()">
+                <span class="dot"></span>
+                <span>я оставила еще кое-что</span>
+                <span class="dot"></span>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- СТРАНИЦА 2: ПАСХАЛКИ -->
+    <!-- ============================================================ -->
+    <div id="page-eggs" class="page">
+        <div class="eggs-container">
+            <span class="back-link" onclick="showMain()">← назад к двери</span>
+
+            <h2>Записи на полях</h2>
+            <p class="eggs-subtitle">то, что не сказано вслух</p>
+
+            <p class="intro">
+                Если ты здесь — значит, ты нашел. Или просто кликнул случайно.
+                В любом случае, вот все, что было спрятано глубже.
+                Только не говори никому.
+            </p>
+
+            <!-- ==================================================== -->
+            <!-- ЭТАП 1: ОСНОВНЫЕ ПАСХАЛКИ -->
+            <!-- ==================================================== -->
+            <div class="egg">
+                <div class="egg-title">Первая буква на зеркале</div>
+                <p class="egg-text">
+                    Зеркало. Свет падает так, что почти ничего не видно. Но если присмотреться — на нем буква. Одна. Она проступает еле-еле, будто ее написали пальцем по запотевшему стеклу. Это первая буква того, кто все это оставил. Поймешь — поймешь. Нет — значит, не время.
+                </p>
+            </div>
+
+            <div class="egg">
+                <div class="egg-title">Семь бумажек</div>
+                <p class="egg-text">
+                    Их вышло семь. Я оставляла их, где хотела, и не думала, найдутся ли все. Если нашел не все — ничего страшного. Они и не должны были сложиться в одно. Пара слов для тебя в случайных местах.
+                </p>
+            </div>
+
+            <div class="egg">
+                <div class="egg-title">Плейлист в наушниках</div>
+                <p class="egg-text">
+                    Загляни в плейлист. Там нет случайных песен — там все, что я слушала, пока думала о тебе. Каждый трек — это ночь, мысль, тихое „а вдруг“. Не случайный набор. Все — про тебя.
+
+                    <ul class="playlist">
+                        <li>Cold Carti — «дом»</li>
+                        <li>Cold Carti — «все тебе радо»</li>
+                        <li>Lil Peep — «haunt u»</li>
+                        <li>Zhanulka — «стреляй»</li>
+                        <li>Zhanulka — «ток»</li>
+                        <li>Zhanulka — «лазить по стенам»</li>
+                        <li>T-Fest — «люби меня, люби»</li>
+                        <li>Нервы — «самый дорогой человек»</li>
+                        <li>Нервы — «слишком влюблен»</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="egg">
+                <div class="egg-title">Книга на полочке</div>
+                <p class="egg-text">
+                    Один корешок выбивается из ряда. Открой его. Дальше — тишина и ты.
+                </p>
+            </div>
+
+            <!-- Затык 1 -->
+            <div class="more-hint" onclick="openStage('stage-focus')">
+                <span class="more-label">это еще не все</span>
+                <span class="more-arrow">↓</span>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- ЭТАП 2: ТИХИЙ ФОКУС (НОВАЯ ИГРА) -->
+            <!-- ==================================================== -->
+            <div id="stage-focus" class="egg-stage center-stage">
+                <h3 class="egg-section-title">Тихий фокус</h3>
+                <p class="egg-section-sub">Тишина. Фокус. Прогресс.</p>
+
+                <div class="focus-download">
+                    <a
+                        href="https://drive.google.com/file/d/1kPrTubGpjy7PgDP-6PqgrkmIEmGtYl-e/view?usp=sharing"
+                        class="download-button"
+                        target="_blank"
+                        rel="noopener"
+                    >Скачать игру</a>
+                    <p class="download-note">скачай папку и запусти «Тихий фокус.exe»</p>
+                </div>
+
+                <!-- Затык 2 -->
+                <div class="more-hint" onclick="openStage('stage-focus-eggs')">
+                    <span class="more-label">а вот что я спрятала глубже</span>
+                    <span class="more-arrow">↓</span>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- ЭТАП 3: ПАСХАЛКИ ОТ ТИХОГО ФОКУСА -->
+            <!-- ==================================================== -->
+            <div id="stage-focus-eggs" class="egg-stage">
+                <h3 class="egg-section-title">То, что я оставила для тебя</h3>
+                <p class="egg-section-sub">маленькие вещи, которые становятся заметными, если задержаться</p>
+
+                <p class="egg-text" style="margin-bottom:2.5rem;">
+                    Если ты нашел это — значит, ты не просто прошел игру. Ты остался в ней чуть дольше.
+                    Посмотрел по сторонам. Нажал туда, куда можно было не нажимать.
+                    Я все заметила.
+                </p>
+
+                <div class="egg">
+                    <div class="egg-title">F в главном меню</div>
+                    <p class="egg-text">
+                        Попробуй нажать <em>F</em> в главном меню.
+                    </p>
+                    <p class="egg-text">
+                        Чат сойдет с ума. <em>F, F, F</em> — сто раз. Сто. Раз.
+                    </p>
+                    <p class="egg-text">
+                        F пишут, когда стрим упал. Это не грусть и не поддержка — это просто рефлекс.
+                        Как зевота. Как «алло» в трубку. Ты не знаешь, что сказать, — и пишешь F.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Alt+F4</div>
+                    <p class="egg-text">
+                        Попробуй закрыть игру через <em>Alt+F4</em>.
+                    </p>
+                    <p class="egg-text">
+                        Она не закроется. Вместо этого чат тихо напишет:
+                    </p>
+                    <p class="egg-text">
+                        <em>«И ты реально хочешь иммортала без тренировок? +250 бб».</em>
+                    </p>
+                    <p class="egg-text">
+                        Я знаю, как иногда хочется сразу все уметь. Сразу попасть. Сразу подняться.
+                        Сразу оказаться там, куда другие идут месяцами.
+                    </p>
+                    <p class="egg-text">
+                        Но за каждым высоким рангом есть часы, которые никто не видит.
+                        Возвращайся, как будет время, я в тебя верю.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Тридцать секунд без движения</div>
+                    <p class="egg-text">
+                        Если просто остановиться и ничего не делать тридцать секунд, чат начнет волноваться.
+                        Сначала появится: <em>«чат, вы живы?»</em>. Потом: <em>«тишина...»</em>
+                    </p>
+                    <p class="egg-text">
+                        А когда ты снова двинешься — чат успокоится. Ты вернулся. Ну и хорошо.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Клик по нику</div>
+                    <p class="egg-text">
+                        Нажми на любое имя в чате — и снизу появится маленькая подпись.
+                        У каждого бота их три. Я придумала их как маленькие заметки о людях,
+                        с которыми ты сидишь в этом лобби.
+                    </p>
+                    <ul class="playlist">
+                        <li><em>aesthhh:</em> «Последний в лобби, первый в жалобах. Классика.» · «Без пингов, без войса, без шансов. Но стрим идет.» · «Стримит как я, играет как бот. Diamond — его дом родной.»</li>
+                        <li><em>aesthettie:</em> «Radiant. Смотрит молча. Так и надо.» · «Делает игру, в которой он играет. Скромно.» · «Тут просто чтобы посмотреть. И все.»</li>
+                        <li><em>faxezad_:</em> «Тут каждый стрим. Стабильность — его второе имя.» · «Первый в чате, всегда на связи.» · «Поддержка уровня "легенда".»</li>
+                        <li><em>Dobrovsem_chill:</em> «Добряк. Иногда в рифму. Иногда не в тему.» · «Работать не может, но чат держит на себе.» · «Молодой, но уже легенда чата.»</li>
+                    </ul>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Пять попаданий</div>
+                    <p class="egg-text">
+                        После пяти попаданий подряд чат напишет: <em>«легендочка»</em>.
+                    </p>
+                    <p class="egg-text">
+                        Ну ты же действительно легендочка.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Десять попаданий</div>
+                    <p class="egg-text">
+                        После десяти попаданий появится: <em>«время аппнуть радика»</em>.
+                    </p>
+                    <p class="egg-text">
+                        Это звучит как мем, но я вложила туда настоящую веру.
+                        Может быть, ты действительно готов. А может, тебе просто нужно,
+                        чтобы кто-то первым в это поверил.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Три промаха</div>
+                    <p class="egg-text">
+                        После трех промахов чат не станет смеяться. Он напишет: <em>«разминочная · F»</em>.
+                    </p>
+                    <p class="egg-text">
+                        Первая разминочная всегда бывает, бывает и вторая разминочная.
+                        Третья — сомнительно конечно, но рано или поздно в кд выйдешь.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Проигрыш</div>
+                    <p class="egg-text">
+                        После проигрыша чат засыплет тебя двадцатью <em>F</em>.
+                        Это не похороны, расслабься. Просто все решили немного драматично сказать: «ну бывает».
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Победа</div>
+                    <p class="egg-text">
+                        После победы чат взорвется: <em>«GIGACHAD · POG»</em>.
+                    </p>
+                    <p class="egg-text">
+                        Можешь потешить свое эго, но ты умничка получается.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Десять кликов по энергетику</div>
+                    <p class="egg-text">
+                        Если кликнуть по банке десять раз, курсор начнет дрожать. Всего три секунды.
+                        А потом чат скажет: <em>«кажется, хватит энергетиков»</em>.
+                    </p>
+                    <p class="egg-text">
+                        Чатик иногда все-таки может быть прав.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Клик по энергетику</div>
+                    <p class="egg-text">
+                        Одного клика по банке хватит, чтобы увидеть: <em>«побереги сердечко»</em>.
+                    </p>
+                    <p class="egg-text">
+                        Я знаю, как бывает: еще одна катка, еще один раунд, еще пять минут.
+                        А потом за окном уже светло.
+                    </p>
+                    <p class="egg-text">
+                        Так что это просто маленькое напоминание от игры.
+                        Пей воду. Отдыхай иногда. Береги себя. Сердечко у тебя одно.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Уровень, который открывается только терпением</div>
+                    <p class="egg-text">
+                        Есть уровень, который нельзя открыть случайно.
+                        Нужно пройти предыдущие и сохранить точность не ниже 90% на каждом.
+                        Не стать идеальным. Не играть без единой ошибки. Просто не бросить.
+                    </p>
+                    <p class="egg-text">
+                        Всегда можно начать заново, ведь нет ничего невозможного.
+                    </p>
+                </div>
+
+                <div class="egg">
+                    <div class="egg-title">Скрытая концовка</div>
+                    <p class="egg-text">
+                        Есть финал, который появляется только после четырех уровней на 100%.
+                    </p>
+                    <p class="egg-text">
+                        Когда все получится, экран погаснет. На несколько секунд останется только тишина.
+                        А потом появится:
+                    </p>
+                    <p class="egg-text">
+                        <em>«Ты — Тихий фокус. Дальше только ты сам.»</em>
+                    </p>
+                    <p class="egg-text">
+                        Через пять секунд игра вернет тебя в меню.
+                        Без салюта. Без большой награды. Просто мягкая точка в конце всего пути.
+                    </p>
+                    <p class="egg-text">
+                        Я не думала, что кто-то дойдет сюда. Но если ты дошел — спасибо.
+                        Значит, я оставляла все это не зря.
+                    </p>
+                </div>
+
+                <!-- Последняя пасхалка -->
+                <div class="egg">
+                    <div class="egg-title">Десять кликов по aesthettie</div>
+                    <p class="egg-text">
+                        Если кликнуть по нику <em>aesthettie</em> десять раз, чат наполнится сердечками.
+                        Двадцать сообщений с <em>♡</em>, одно за другим.
+                    </p>
+                    <p class="egg-text">
+                        <em>♡</em>
+                    </p>
+                </div>
+
+                <!-- Затык 3 -->
+                <div class="more-hint" onclick="openStage('stage-video')">
+                    <span class="more-label">Для чего все это?</span>
+                    <span class="more-arrow">↓</span>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- ЭТАП 4: ВИДЕО — ДЛЯ ЧЕГО ВСЕ ЭТО -->
+            <!-- ==================================================== -->
+            <div id="stage-video" class="egg-stage">
+                <h3 class="egg-section-title">Откровение</h3>
+                <p class="egg-section-sub">час · без монтажа · без второго дубля</p>
+
+                <div class="egg">
+                    <p class="egg-text">
+                        Я записала видео. Час. Без монтажа, без сценария, без второго дубля.
+                        Просто я, камера, микрофон и все, что я не сказала ни в «Тишина за дверью», ни в «Тихом фокусе», ни в жизни.
+                        Это мое признание — не только в том, что я сделала эти игры, а в том, <em>почему</em>.
+                        Кому, зачем, для чего все это было.
+                    </p>
+
+                    <div class="video-block">
+                        <span class="video-label">видео · один час · без монтажа</span>
+                        <div class="video-title">Откровение</div>
+                        <p class="video-desc">
+                            Я говорю все. Про игры, про пасхалки, про тебя, про то, что было до и после.
+                            Это последнее, что я оставила.
+                        </p>
+                        <a
+                            href="https://drive.google.com/file/d/13NsYI-BCqMydXHX2IIo20nJAOb3S5N7s/view?usp=sharing"
+                            class="download-button"
+                            target="_blank"
+                            rel="noopener"
+                        >Смотреть откровение</a>
+                    </div>
+                </div>
+            </div>
+
+            <p class="footer-note">
+                Если ты нашел эту страницу и улыбнулся — значит, все было не зря.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ---------- Пароль для входа ----------
+        const CORRECT_PASSWORD = '22.08.2026';
+
+        function checkPassword(event) {
+            event.preventDefault();
+
+            const input = document.getElementById('password-input');
+            const error = document.getElementById('lock-error');
+
+            const value = input.value.trim();
+
+            if (value === CORRECT_PASSWORD) {
+                error.textContent = '';
+                document.getElementById('page-lock').classList.remove('active');
+                document.getElementById('page-main').classList.add('active');
+                window.scrollTo(0, 0);
+            } else {
+                error.textContent = 'Тишина не пускает. Вернись к тому, с чего все началось';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        // ---------- Переключение на пасхалки ----------
+        function showEggs() {
+            document.getElementById('page-main').classList.remove('active');
+            document.getElementById('page-eggs').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function showMain() {
+            document.getElementById('page-eggs').classList.remove('active');
+            document.getElementById('page-main').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // ---------- Открытие этапов пасхалок ----------
+        function openStage(id) {
+            const stage = document.getElementById(id);
+            if (!stage) return;
+            stage.classList.add('open');
+
+            setTimeout(() => {
+                stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 150);
+        }
+
+        // ---------- Пылинки ----------
+        const dustContainer = document.getElementById('dust');
+        const dustCount = 40;
+
+        for (let i = 0; i < dustCount; i++) {
+            const particle = document.createElement('span');
+
+            const size     = Math.random() * 3 + 1;
+            const left     = Math.random() * 100;
+            const duration = Math.random() * 20 + 12;
+            const delay    = Math.random() * 20;
+
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = left + '%';
+            particle.style.bottom = '-10px';
+            particle.style.animationDuration = duration + 's';
+            particle.style.animationDelay = delay + 's';
+            particle.style.opacity = (Math.random() * 0.5 + 0.4).toFixed(2);
+
+            dustContainer.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
